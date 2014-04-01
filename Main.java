@@ -30,9 +30,6 @@ public class Main {
 			JSONParser parser = new JSONParser();
 			GenericUrl url = new GenericUrl("https://www.googleapis.com/freebase/v1/search");
 			url.put("query", query);
-			//url.put("filter", "(all type:/music/artist created:\"The Lady Killer\")");
-			//url.put("limit", "5");
-			url.put("indent", "true");
 			url.put("key", accountKey);
 			HttpRequest request = requestFactory.buildGetRequest(url);
 			HttpResponse httpResponse = request.execute();
