@@ -1,4 +1,3 @@
-
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
@@ -17,17 +16,18 @@ import org.apache.commons.lang3.StringUtils;
 public class part2 {
 	public static void main(String[] args) {
 		try {
-
+			
+			//come from parameters
 			String accountKey = "AIzaSyCIQ8gDGEMgxJpSsGK6BwkfLZXtN4MTf4E";
-
+			String search = "Lord of the Rings";
+					
 			HttpTransport httpTransport = new NetHttpTransport();
 			HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
 			JSONParser parser = new JSONParser();
 
-			//need to make query for book AND organization
-			//String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\"Google\"}],\"id\":null,\"name\":null,\"type|=\":[\"/book/author\",\"/organization/organization_founder\"]}]";
-			String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\"Lord of the Rings\"}],\"id\":null,\"name\":null,\"type\":\"/book/author\"}]";
-
+			//query for books
+			String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\""+search+"\"}],\"id\":null,\"name\":null,\"type\":\"/book/author\"}]";
+			
 			GenericUrl url = new GenericUrl("https://www.googleapis.com/freebase/v1/mqlread");
 			url.put("query", query);
 			url.put("key", accountKey);
@@ -35,7 +35,6 @@ public class part2 {
 			HttpResponse httpResponse = request.execute();
 			JSONObject response = (JSONObject)parser.parse(httpResponse.parseAsString());
 			JSONArray results = (JSONArray)response.get("result");
-			System.out.println(results);
 			
 			Map<String, String> resultList = new TreeMap<String, String>(); 
 			for (Object result : results) {
@@ -52,8 +51,6 @@ public class part2 {
 				}else{
 					type = "?";
 				}
-				//for a businessperson
-
 				//compressing their creations
 				String creationStr = "";
 				for(int i=0; i<creations.size(); i++){
@@ -69,6 +66,50 @@ public class part2 {
 				}
 				resultList.put(name, name+" (as "+type+") created "+creationStr);
 			}
+
+			//query for organization
+			//String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\"Google\"}],\"id\":null,\"name\":null,\"type|=\":[\"/book/author\",\"/organization/organization_founder\"]}]";
+			String query2 = "[{\"/organization/organization_founder/organizations_founded\":[{\"a:name\":null,\"name~=\":\""+search+"\"}],\"id\":null,\"name\":null,\"type\":\"/organization/organization_founder\"}]";
+			
+			url = new GenericUrl("https://www.googleapis.com/freebase/v1/mqlread");
+			url.put("query", query2);
+			url.put("key", accountKey);
+			request = requestFactory.buildGetRequest(url);
+			httpResponse = request.execute();
+			response = (JSONObject)parser.parse(httpResponse.parseAsString());
+			results = (JSONArray)response.get("result");
+			
+			for (Object result : results) {
+				String name = JsonPath.read(result,"$.name").toString();
+				ArrayList<String> creations = new ArrayList<String>();
+				String type = null;
+				//for an author
+				if(JsonPath.read(result,"$.type").toString().contains("/organization/organization_founder")){
+					type = "Businessperson";
+					int count = StringUtils.countMatches(JsonPath.read(result,"$./organization/organization_founder/organizations_founded").toString(), "a:name");
+					for(int i=0; i<count; i++){
+						creations.add(JsonPath.read(result,"$./organization/organization_founder/organizations_founded.a:name["+i+"]").toString());
+					}
+				}else{
+					type = "?";
+				}
+				//compressing their creations
+				String creationStr = "";
+				for(int i=0; i<creations.size(); i++){
+					if(i==0){
+						creationStr = creationStr +"<"+ creations.get(i) + ">";
+					}else if(creations.size()>2 && i==creations.size()-1){
+						creationStr = creationStr + ", and <" + creations.get(i) +">";
+					}else if(creations.size()==2 && i==creations.size()-1){
+						creationStr = creationStr + " and <" + creations.get(i) +">";
+					}else{
+						creationStr = creationStr + ", <" + creations.get(i) + ">";
+					}
+				}
+				resultList.put(name, name+" (as "+type+") created "+creationStr);
+			}
+			
+			//print out results
 			int i = 0;
 			for(Entry<String, String> entry : resultList.entrySet()){
 				i = i +1;
