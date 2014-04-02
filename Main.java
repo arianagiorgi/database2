@@ -67,11 +67,15 @@ public class Main {
 					JSONObject topic = (JSONObject)parser.parse(httpResponse2.parseAsString());
 
 					ArrayList<String> topicList = new ArrayList<String>();
-
-					//return first 10 freebase type results
-					for(int j=0; j<10; j++){
+					
+					//******THIS IS THE NEW PART *************
+					//return freebase type results
+					String countTypes = JsonPath.read(topic,"$.property['/type/object/type'].count").toString();
+					double numTypes = Double.valueOf(countTypes);
+					for(int j=0; j<numTypes; j++){
 						topicList.add(JsonPath.read(topic,"$.property['/type/object/type'].values["+j+"].id").toString());
 					}
+					//**********END OF NEW PART**********
 
 					//System.out.println(topicList);
 
