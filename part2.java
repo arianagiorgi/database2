@@ -1,3 +1,5 @@
+package dbproj2;
+
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
@@ -68,7 +70,6 @@ public class part2 {
 			}
 
 			//query for organization
-			//String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\"Google\"}],\"id\":null,\"name\":null,\"type|=\":[\"/book/author\",\"/organization/organization_founder\"]}]";
 			String query2 = "[{\"/organization/organization_founder/organizations_founded\":[{\"a:name\":null,\"name~=\":\""+search+"\"}],\"id\":null,\"name\":null,\"type\":\"/organization/organization_founder\"}]";
 			
 			url = new GenericUrl("https://www.googleapis.com/freebase/v1/mqlread");
