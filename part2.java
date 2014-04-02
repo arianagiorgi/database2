@@ -25,6 +25,7 @@ public class part2 {
 			JSONParser parser = new JSONParser();
 
 			//need to make query for book AND organization
+			//String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\"Google\"}],\"id\":null,\"name\":null,\"type|=\":[\"/book/author\",\"/organization/organization_founder\"]}]";
 			String query = "[{\"/book/author/works_written\":[{\"a:name\":null,\"name~=\":\"Lord of the Rings\"}],\"id\":null,\"name\":null,\"type\":\"/book/author\"}]";
 
 			GenericUrl url = new GenericUrl("https://www.googleapis.com/freebase/v1/mqlread");
@@ -34,6 +35,7 @@ public class part2 {
 			HttpResponse httpResponse = request.execute();
 			JSONObject response = (JSONObject)parser.parse(httpResponse.parseAsString());
 			JSONArray results = (JSONArray)response.get("result");
+			System.out.println(results);
 			
 			Map<String, String> resultList = new TreeMap<String, String>(); 
 			for (Object result : results) {
