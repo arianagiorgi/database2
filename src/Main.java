@@ -31,9 +31,6 @@ public class Main {
 			JSONParser parser = new JSONParser();
 			GenericUrl url = new GenericUrl("https://www.googleapis.com/freebase/v1/search");
 			url.put("query", query);
-			//url.put("filter", "(all type:/music/artist created:\"The Lady Killer\")");
-			//url.put("limit", "5");
-			url.put("indent", "true");
 			url.put("key", accountKey);
 			HttpRequest request = requestFactory.buildGetRequest(url);
 			HttpResponse httpResponse = request.execute();
@@ -75,13 +72,19 @@ public class Main {
 					JSONObject topic = (JSONObject)parser.parse(httpResponse2.parseAsString());
 
 					ArrayList<String> topicList = new ArrayList<String>();
+<<<<<<< HEAD:src/Main.java
 
+=======
+					
+					//******THIS IS THE NEW PART *************
+>>>>>>> FETCH_HEAD:Main.java
 					//return freebase type results
 					String countTypes = JsonPath.read(topic,"$.property['/type/object/type'].count").toString();
 					double numTypes = Double.valueOf(countTypes);
 					for(int j=0; j<numTypes; j++){
 						topicList.add(JsonPath.read(topic,"$.property['/type/object/type'].values["+j+"].id").toString());
 					}
+					//**********END OF NEW PART**********
 
 
 					//System.out.println(topicList);
